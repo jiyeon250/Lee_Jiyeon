@@ -17,7 +17,6 @@ except:
 
 import nuke
 import ffmpeg
-# import subprocess
 import os
 import re
 import shutil
@@ -29,8 +28,6 @@ class MainPublish(QWidget):
         super().__init__()         
 
         ui_file_path = "/home/rapa/yummy/pipeline/scripts/publish/publish_ver6.ui"
-        # ui_file_path = "/home/rapa/sub_server/pipeline/scripts/publish_ver6.ui"
-        # ui_file_path = 'C:/Users/LEE JIYEON/Desktop/sub_server/pipeline/scripts/publish_ver6.ui'
 
         ui_file = QFile(ui_file_path)
         ui_file.open(QFile.ReadOnly)
@@ -47,11 +44,7 @@ class MainPublish(QWidget):
 
         # Signal
         self.ui.pushButton_add_to_basket.clicked.connect(self.on_add_button_clicked)
-        # self.ui.pushButton_version.clicked.connect(self.make_message_for_upload)
-        
         self.ui.pushButton_version.clicked.connect(self.copy_to_Main_from_Sub)
-        # self.ui.pushButton_publish.clicked.connect(self.make_message_for_upload)
-        
         self.ui.pushButton_publish.clicked.connect(self.copy_to_pub_in_MainServer)
         self.ui.pushButton_delete.clicked.connect(self.delete_tablewidget_item)
 
@@ -80,7 +73,7 @@ class MainPublish(QWidget):
         self.ver = split[3]
 
     def setup_top_bar(self):
-        """정보 나타내는 상단바 세팅"""
+        """Top-bar about information like project, team_name, shot_code """
         split = self.nk_full_path.split("/")
         project_name = split[-8]
 
@@ -91,7 +84,7 @@ class MainPublish(QWidget):
     # ======================================================================
 
     def create_listwidget_in_groubBox(self):
-        """파일확장자에 따라 listwidget 생성해주고 그룹박스안에 넣어주는 함수"""
+        """create listwidget according to file extension and put into Group box"""
 
         # nk_page
         nk_page = QWidget()
@@ -137,7 +130,7 @@ class MainPublish(QWidget):
 
 
     def open_nk_file_dialog(self):
-        """nk 아이템 다이알로그"""
+        """nk item Dialog"""
 
         file_dialog = QFileDialog.getOpenFileNames(self, "Select Files from Local", self.work_folder_path, "All Files (*)")
         selected_files = file_dialog[0]
@@ -155,7 +148,7 @@ class MainPublish(QWidget):
                 self.nk_file_listwidget.setCurrentItem(items[0])
 
     def open_mov_file_dialog(self):
-        """mov 아이템 다이알로그"""
+        """mov item Dialog"""
 
         file_dialog = QFileDialog.getOpenFileNames(self, "Select Files from Local", self.mov_folder_path, "All Files (*)")
         selected_files = file_dialog[0]
@@ -173,7 +166,7 @@ class MainPublish(QWidget):
                 self.mov_file_listwidget.setCurrentItem(items[0])
 
     def open_exr_folder_dialog(self):
-        """exr 아이템 다이알로그 (폴더째로)"""
+        """exr item Dialog (by folder)"""
 
         QMessageBox.information(self, "Folder Selected", "Please select 'Folder' for exr")
 
@@ -190,6 +183,7 @@ class MainPublish(QWidget):
     # ===================================================================
 
     def setup_tablewidget_basket(self):
+        """when clicked the add button, items are added in tablewidget"""
 
         self.ui.tableWidget_basket.setHorizontalHeaderLabels(["Publish File", "File Info"])
         self.ui.tableWidget_basket.setVerticalHeaderLabels(["nk", "exr", "mov"])
@@ -198,10 +192,6 @@ class MainPublish(QWidget):
         height = 80
         for row in range(row_count):
             self.ui.tableWidget_basket.setRowHeight(row, height)
-
-        # self.add_nk_item_tablewidget_basket()
-        # self.add_exr_item_tablewidget_basket()
-        # self.add_mov_item_tablewidget_basket()
 
     def add_nk_item_tablewidget_basket(self):
         
@@ -221,7 +211,6 @@ class MainPublish(QWidget):
                 self.ui.tableWidget_basket.setItem(0, 1, nk_validation_info)
         else:
             pass
-            # nuke.message("nk 파일을 선택해주세요")
             
     def add_mov_item_tablewidget_basket(self):
 
@@ -270,6 +259,7 @@ class MainPublish(QWidget):
             pass
         
     def _get_nk_validation_info(self):
+        """takeout info for validation before going through publishing"""
 
         nk_file_validation_dict = {}
         root = nuke.root()
@@ -296,9 +286,6 @@ class MainPublish(QWidget):
             colorspace = video_stream.get('color_space', "N/A")
             width = int(video_stream['width'])
             height = int(video_stream['height'])
-            # frame = 1
-            # a = video_stream.keys()
-            # print(a)
 
             resolution = f"{width}x{height}"
 
@@ -308,9 +295,7 @@ class MainPublish(QWidget):
                 "codec_name": codec_name,
                 "colorspace": colorspace,
                 "resolution": resolution,
-                # "frame": frame
             }
-            # print(file_validation_info_dict)
             return file_validation_info_dict
     
     def _get_mov_validation_info(self, file_path):
@@ -325,8 +310,6 @@ class MainPublish(QWidget):
             width = int(video_stream['width'])
             height = int(video_stream['height'])
             frame = int(video_stream['nb_frames'])
-            # a = video_stream.keys()
-            # print(a)
 
             resolution = f"{width}x{height}"
 
@@ -338,11 +321,10 @@ class MainPublish(QWidget):
                 "resolution": resolution,
                 "frame": frame
             }
-            # print(file_validation_info_dict)
             return file_validation_info_dict
     
     def count_tablewidget_item(self):
-        """테이블위젯에 몇 개의 아이템이 있는지 label에 표시해주는 함수"""
+        """count items in tablewidget"""
         row_count = self.ui.tableWidget_basket.rowCount()
 
         item_count = 0
@@ -356,7 +338,7 @@ class MainPublish(QWidget):
         return item_count
 
     def delete_tablewidget_item(self):
-        """테이블위젯에 잘못 추가된 아이템 삭제 할 수 있게 하는 함수"""
+        """delete items if you want"""
         item_count = self.count_tablewidget_item()
         selected_items = self.ui.tableWidget_basket.selectedItems()
 
@@ -370,6 +352,7 @@ class MainPublish(QWidget):
                 self.ui.tableWidget_basket.setItem(row, column, None)
             
     # #==================================================================
+    # move items from seb_server to main_server 
 
     def _find_sub_server_path(self):
 
@@ -414,9 +397,6 @@ class MainPublish(QWidget):
         """Take the file_path, version it up and Save it"""
 
         sub_server_paths = self._find_sub_server_path() # nk, mov는 파일까지 포함된 풀패스, exr은 버전폴더까지만
-        # nk : dev/work/opn_0010_mm_v010.nknc
-        # mov : dev/mov/opn_0010_mm_v010.mov
-        # exr : dev/exr/opn_0010_mm_v010
 
         version_pattern = re.compile("v\d{3}")
         
@@ -427,7 +407,6 @@ class MainPublish(QWidget):
 
             highest_version = self._get_highest_version_number(base_dir, version_pattern) # nk, mov는 아이템에서 버전패턴 검색, exr은 폴더에서 버전패턴 검색
             origin_version = version_pattern.search(base).group(0)
-            # print(f"{origin_version}: 오리진버전")
 
             new_version = f"v{highest_version + 1:03}"
 
@@ -446,12 +425,11 @@ class MainPublish(QWidget):
                 self.mov_new_ver_item = mov_ver_up_path.split("/")[-1]
                 print(f"{self.mov_new_ver_item}:모브뉴아이템")
                 new_ver_sub_server_paths.append(mov_ver_up_path)
-                # print("======mov======")
                 shutil.copy2(sub_server_path, mov_ver_up_path)
                 print("mov file이 version-up 되었습니다.")
 
-            elif os.path.isdir(sub_server_path):     #sub_server_path = 폴더까지 있는 오리진 폴더 경로
-                new_ver_folder = new_base            #버전업된 폴더경로
+            elif os.path.isdir(sub_server_path):    
+                new_ver_folder = new_base        
                 os.makedirs(new_ver_folder, exist_ok=True)
 
                 for exr_file in os.listdir(sub_server_path):
@@ -459,9 +437,7 @@ class MainPublish(QWidget):
                     match = version_pattern.search(exr_file)
                     if match:
                         current_ver_in_file = match.group(0)
-                        # print(f"{current_ver_in_file}:파일 버전")
                         new_exr_file = exr_file.replace(current_ver_in_file, new_version)
-                        # print(f"{new_version}:뉴 버전")
                         new_exr_path = os.path.join(new_ver_folder, new_exr_file)
                         self.exr_new_ver_item = new_exr_path.split("/")[-1]
                         
@@ -480,18 +456,14 @@ class MainPublish(QWidget):
         """Find matching folder from Json and make Server path until 'seq' """
 
         json_file_path = '/home/rapa/yummy/pipeline/json/project_data.json'
-        # json_file_path = '/home/rapa/sub_server/pipeline/scripts/project_data.json'
-        # json_file_path = 'C:/Users/LEE JIYEON/Desktop/sub_server/pipeline/scripts/project_data.json'
         path_finder = PathFinder(json_file_path)
 
         start_path = '/home/rapa/YUMMY/project'
-        # start_path = 'C:/Users/LEE JIYEON/Desktop/sub_server/project'
 
         # Get the new path
         server_project_path = path_finder.append_project_to_path(start_path)
         server_seq_path = f"{server_project_path}seq/"
 
-        # print(f"{server_seq_path}: 메인서브 seq/까지 나오는지")
         return server_seq_path
     
     def _find_MainServer_path(self):
@@ -505,34 +477,6 @@ class MainPublish(QWidget):
         nk_main_server_path = f"{seq_path}{self.seq}/{self.shot_code}/{self.team}/dev/work/{self.nk_new_ver_item}"
         exr_main_server_path = f"{seq_path}{self.seq}/{self.shot_code}/{self.team}/dev/exr/{new_ver_folder}"
         mov_main_server_path = f"{seq_path}{self.seq}/{self.shot_code}/{self.team}/dev/mov/{self.mov_new_ver_item}"
-        # print(f"{mov_main_server_path}: 모브메인서버패스 제대로 나오닝")
-
-        # # version pattern setting
-        # version_pattern = re.compile("v\d{3}")
-
-        # nk_match = version_pattern.search(nk_main_server_path)
-        # exr_match = version_pattern.search(exr_main_server_path)
-        # mov_match = version_pattern.search(mov_main_server_path)
-        
-        # # server_path (after version-up)
-
-        # if nk_match:
-        #     current_version = nk_match.group(0)
-        #     new_number = int(current_version[1:]) + 1
-        #     new_version = f"v{new_number:03}"
-        #     nk_verup_main_server_path = nk_main_server_path.replace(current_version, new_version)
-
-        # if exr_match:
-        #     current_version = exr_match.group(0)
-        #     new_number = int(current_version[1:]) + 1
-        #     new_version = f"v{new_number:03}"
-        #     exr_verup_main_server_path = exr_main_server_path.replace(current_version, new_version)
-
-        # if mov_match:
-        #     current_version = mov_match.group(0)
-        #     new_number = int(current_version[1:]) + 1
-        #     new_version = f"v{new_number:03}"
-        #     mov_verup_main_server_path = mov_main_server_path.replace(current_version, new_version)
 
         verup_main_server_paths.extend([nk_main_server_path, exr_main_server_path, mov_main_server_path])
 
@@ -546,24 +490,17 @@ class MainPublish(QWidget):
         for verup_sub_server_path in verup_sub_server_paths:
             verup_sub_server_path = verup_sub_server_path.strip()
             _, ext = os.path.splitext(verup_sub_server_path)
-            # print(ext)
 
             if ext == ".nknc":
-                # print(f"{verup_sub_server_path}:누크서브패스")
-                # print(f"{verup_main_server_paths[0]}:누크메인패스")
                 shutil.copy2(verup_sub_server_path, verup_main_server_paths[0])
                 print("nk version up file이 server로 이동되었습니다.")
             
             elif ext == ".exr":
                 exr_verup_sub_server_path = os.path.dirname(verup_sub_server_path)   #exr은 폴더째로 이동하기위해
-                # print(f"{exr_verup_sub_server_path}:이엑스알서브패스")
-                # print(f"{verup_main_server_paths[1]}:이엑스알메인패스")
                 shutil.copytree(exr_verup_sub_server_path, verup_main_server_paths[1], dirs_exist_ok=True)
                 print("exr version up folder가 server로 이동되었습니다.")
 
             elif ext == ".mov":
-                # print(f"{verup_sub_server_path}:모브서브패스")
-                # print(f"{verup_main_server_paths[2]}:모브메인패스")
                 shutil.copy2(verup_sub_server_path, verup_main_server_paths[2])
                 print("mov version up file이 server로 이동되었습니다.")
 
@@ -590,26 +527,19 @@ class MainPublish(QWidget):
         for verup_sub_server_path in verup_sub_server_paths:
             verup_sub_server_path = verup_sub_server_path.strip()
             base, ext = os.path.splitext(verup_sub_server_path)
-            # print(ext)
 
             if ext == ".nknc":
-                # print(f"{verup_sub_server_path}:누크로컬패스")
-                # print(f"{verup_main_server_paths[0]}:누크서버패스")
                 shutil.copy2(verup_sub_server_path, verup_main_server_paths[0])
                 shutil.copy2(verup_main_server_paths[0], ver_up_server_pub_paths[0])
                 print("nk version up file이 server로 이동되었습니다.")
             
             elif ext == ".exr":
                 exr_verup_sub_server_path = os.path.dirname(verup_sub_server_path)
-                # print(f"{exr_verup_sub_server_path}:이엑스알로컬패스")
-                # print(f"{verup_main_server_paths[1]}:이엑스알서버패스")
                 shutil.copytree(exr_verup_sub_server_path, verup_main_server_paths[1], dirs_exist_ok=True)
                 shutil.copytree(verup_main_server_paths[1], ver_up_server_pub_paths[1], dirs_exist_ok=True)
                 print("exr version up folder가 server로 이동되었습니다.")
 
             elif ext == ".mov":
-                # print(f"{verup_sub_server_path}:모브로컬패스")
-                # print(f"{verup_main_server_paths[2]}:모브서버패스")
                 shutil.copy2(verup_sub_server_path, verup_main_server_paths[2])
                 shutil.copy2(verup_main_server_paths[2], ver_up_server_pub_paths[2])
                 print("mov version up file이 server로 이동되었습니다.")
@@ -655,7 +585,6 @@ class MainPublish(QWidget):
 
         for number in range(1, max_num + 1):
             node_name = f"{base_name}{number}"
-            # print(node_name)
             read_node = nuke.toNode(node_name)
             if read_node is not None:
                 break
@@ -688,7 +617,6 @@ class MainPublish(QWidget):
 
     def generate_nk_thumbnail_from_file(self):
 
-        # nk_path = f"{self.nk_file_path}/{self.nk_file_names[0]}"
         nk_path = f"{self.work_folder_path}{self.nk_file_names[0]}"
         base, _ = os.path.splitext(nk_path)
         image_name = base.split("/")[-1]
@@ -720,22 +648,16 @@ class MainPublish(QWidget):
 
     def generate_exr_thumbnail_from_file(self):
 
-        # split = self.exr_folder_path.split("/")   # exr_folder_path : local path의 exr 폴더임
-        # shot_code = split[-5]
-        # team_name = split[-4]
         exr_name = f"{self.folder_name}.1001.exr"
         image_name = f"{self.folder_name}.1001_exr.png"
         
         thumbnail_path = self._make_thumbnail_path()
-        # print(thumbnail_path)
 
         if not os.path.isdir(thumbnail_path):
             os.makedirs(thumbnail_path)
 
         exr_path = f"{self.exr_folder_path}{self.folder_name}/{exr_name}"
-        # print(f"{exr_path}:이엑스알")
         exr_png_path = f"{thumbnail_path}/{image_name}"
-        # print(f"{exr_png_path}:이엑스알피엔지")
 
         if not os.path.isfile(exr_png_path):
             self._create_exr_thumbnail(exr_path, exr_png_path)
@@ -774,28 +696,6 @@ class MainPublish(QWidget):
         return mov_png_path
     
 
-    # def _create_mov_thumbnail(self, input_path, output_path, frame_number=1):
-    #     try:
-    #         # FFmpeg 명령어를 사용하여 지정된 프레임의 썸네일을 생성합니다.
-    #         subprocess.run(
-    #             [
-    #                 'ffmpeg',
-    #                 '-i', input_path,                 # 입력 파일
-    #                 '-vf', f'select=eq(n\,{frame_number-1})',  # 프레임 선택 필터
-    #                 '-vsync', 'vfr',                  # 가변 프레임 레이트를 사용
-    #                 '-q:v', '2',                      # 품질 설정 (2는 높은 품질)
-    #                 '-frames:v', '1',                 # 단일 프레임 출력
-    #                 output_path                        # 출력 파일
-    #             ],
-    #             capture_output=True,
-    #             text=True,
-    #             check=True
-    #         )
-    #         print(f"Thumbnail created successfully: {output_path}")
-
-    #     except subprocess.CalledProcessError as e:
-    #         print(f"Error running ffmpeg: {e}")
-            
     # #=================================================================
     def gather_thumbnail_info(self):
         thumbnail_list = []
@@ -821,12 +721,8 @@ class MainPublish(QWidget):
 
         if self.ui.pushButton_delete.isChecked():
             image_path = "/home/rapa/yummy/pipeline/scripts/publish/delete_icon2.png"
-            # image_path = "/home/rapa/sub_server/pipeline/scripts/delete_icon2.png"
-            # image_path = "C:/Users/LEE JIYEON/Desktop/sub_server/pipeline/scripts/delete_icon2.png"
         else:
             image_path = "/home/rapa/yummy/pipeline/scripts/publish/delete_icon2.png"
-            # image_path = "/home/rapa/sub_server/pipeline/scripts/delete_icon2.png"
-            # image_path = "C:/Users/LEE JIYEON/Desktop/sub_server/pipeline/scripts/delete_icon2.png"
 
         # use QPixmap for image load and convert to QIcon
         pixmap = QPixmap(image_path)
@@ -839,34 +735,12 @@ class MainPublish(QWidget):
         self.ui.pushButton_delete.setIcon(icon)
         icon_size = QSize(button_size.width() -12, button_size.height() - 12)
         self.ui.pushButton_delete.setIconSize(icon_size)
-    
-    """
-    ★ 메세지 함수
-    """
-
-    # def make_message_for_upload(self):
-    #     msg_box = QMessageBox()
-    #     msg_box.setWindowTitle("Warning")
-    #     msg_box.setText("notValid in validateForm\nDo you still want to proceed?")
-    #     msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-    #     msg_box.setIcon(QMessageBox.Warning)
-    #     result = msg_box.exec()                               
-    #     if result == QMessageBox.Yes:
-    #         nuke.message("Shotgrid로 업로드가 완료되었습니다.")
-    #         print("upload")
-
-    #     else:
-    #         print("validate again")
-
-    """
-    ★ 누크 환경설정 함수 
-    """
 
 def open_ui_in_nuke():
     from importlib import reload
-    # import sys
+    import sys
     global win
-    # sys.path.append("/home/rapa/sub_server/pipeline/scripts")
+    sys.path.append("/home/rapa/sub_server/pipeline/scripts")
     import publish_main
     reload(publish_main)
     win = publish_main.MainPublish()

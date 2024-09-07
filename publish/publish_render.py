@@ -17,7 +17,6 @@ class Render:
             nuke.message("선택된 Write 노드가 없습니다. 생성하시겠습니까?")
             nuke.createNode("Write")
             
-            # print("선택된 Write 노드가 없습니다.")
             return
         
         for node in select_nodes:
@@ -186,9 +185,9 @@ class Render:
 
 def start_render_in_nuke():
     from importlib import reload
-    # import sys
+    import sys
     global win
-    # sys.path.append("/home/rapa/sub_server/pipeline/scripts")
+    sys.path.append("/home/rapa/sub_server/pipeline/scripts")
     import publish_render
     reload(publish_render)
     win = publish_render.Render()

@@ -15,7 +15,6 @@ class Slate:
         
     #===========================================================================================
     # exr에 slate넣기
-    #===========================================================================================
         
     def start_exr(self,exr_path,output):
         
@@ -56,7 +55,6 @@ class Slate:
         print(slate_dic)
         return slate_dic
     
-    #frame수 계산하기
     def get_frame_count_from_directory(self,directory):
         # 디렉토리에서 EXR 파일 목록 가져오기
         exr_files = [f for f in os.listdir(directory) if f.endswith('.exr')]
@@ -80,7 +78,6 @@ class Slate:
     
     #===========================================================================================
     # mov에 slate넣기
-    #===========================================================================================
     
     def start_mov(self,mov_path,output):
         
@@ -135,7 +132,6 @@ class Slate:
             
     #===========================================================================================
     # slate 정보 위치 박스 넣기
-    #===========================================================================================
 
     def input_slate(self,slate_dic):
         print(slate_dic)
@@ -154,14 +150,14 @@ class Slate:
         self.bot_Right = f"drawtext=fontfile=Arial.ttf: text = '{frame}':start_number = 1001 : x=w-tw-5:y=h-th     :fontcolor=white@0.7:fontsize=50"
         self.box = f"drawbox = x=0: y=0: w=1920: h=60: color = black: t=fill,drawbox = x=0: y=1020: w=1920: h=1080: color = black: t=fill,"
        
-if __name__ == "__main__": 
-    exr_path = "/home/rapa/YUMMY/project/YUMMIE/seq/FNL/FNL_010/lgt/dev/exr/FNL_010_lgt_v002"  
-    exr_output = "/home/rapa/YUMMY/project/YUMMIE/seq/FNL/FNL_010/lgt/dev/mov/FNL_010_lgt_v002.mov"     
-    render = Slate()
-    # render.start_exr(exr_path,exr_output)
+# if __name__ == "__main__": 
+#     exr_path = "/home/rapa/YUMMY/project/YUMMIE/seq/FNL/FNL_010/lgt/dev/exr/FNL_010_lgt_v002"  
+#     exr_output = "/home/rapa/YUMMY/project/YUMMIE/seq/FNL/FNL_010/lgt/dev/mov/FNL_010_lgt_v002.mov"     
+#     render = Slate()
+#     # render.start_exr(exr_path,exr_output)
     
-    mov_path = "/home/rapa/YUMMY/project/YUMMIE/seq/FNL/FNL_010/lgt/dev/mov/FNL_010_lgt_v002.mov"  
-    mov_output = "/home/rapa/다운로드/FNL_010_lgt_v001.mov"     
+#     mov_path = "/home/rapa/YUMMY/project/YUMMIE/seq/FNL/FNL_010/lgt/dev/mov/FNL_010_lgt_v002.mov"  
+#     mov_output = "/home/rapa/다운로드/FNL_010_lgt_v001.mov"     
     
-    render.start_mov(mov_path,mov_output)
+#     render.start_mov(mov_path,mov_output)
     
